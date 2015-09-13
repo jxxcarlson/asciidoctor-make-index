@@ -1,4 +1,4 @@
-require_relative 'make_index'
+require 'make_index/text_index'
 
 def message
   out = "\nUsage: 'ruby make_index.rb foo.adoc'\n"

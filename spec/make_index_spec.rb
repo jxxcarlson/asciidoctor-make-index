@@ -1,4 +1,4 @@
-require_relative '../make_index'
+require_relative '../lib/make_index/text_index  '
 
 describe TextIndex do
 
