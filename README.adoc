@@ -55,6 +55,12 @@ alias make-index="ruby $HOME/dev/git/asciidoctor-make-index/lib/make_index.rb"
 
 Then you can run `make-index foo.adoc` from anywhere.
 
+.Help needed
+When I run `rake install`, the gem is installed
+as `make_index (0.1.0)` (verified)
+by running `gem list`). but when I run `$ make_index foo.adoc`
+I get the error 'make_index: command not found'
+
 === Notes
 
 . The index feature of Asciidoctor-LaTeX experimental.
