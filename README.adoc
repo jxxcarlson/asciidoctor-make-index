@@ -1,5 +1,10 @@
 == Making an Index
 
+`make_index` is a Ruby program for generating
+an index for Asciidoc documents.  At the
+moment it requires the `Asciidoctor-LaTeX` extension.
+
+
 Mark terms like this if you want them to appear
 in the document index:
 ----
@@ -25,9 +30,28 @@ index.  To play with it, do this:
 Then view the file `keynes_ch_2-indexed.html`
 in your browser.
 
+=== Installation
 
+.Download from GitHub
+----
+  $ git clone https://github.com/jxxcarlson/asciidoctor-make-index
+  $ https://github.com/asciidoctor/asciidoctor-latex
+  $ cd asciidoctor-latex
+  $ rake install
+----
 
-.Notes
+.Stopgap
+Until I get things properly set up, you should also
+say
+
+----
+alias make-index="ruby $HOME/dev/git/asciidoctor-make-index/lib/make_index.rb"
+----
+
+Then you can run `make-index foo.adoc` from anywhere.
+
+=== Notes
+
 . The index feature of Asciidoctor-LaTeX experimental.
 It is designed to be syntax-compatible with the
 corresponding feature for Asciidoctor when
