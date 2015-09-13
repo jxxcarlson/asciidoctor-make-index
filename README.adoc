@@ -10,15 +10,16 @@ in the document index:
 ----
    ((potrezebie))
 ----
-Assuming that your document is `foo.adoc`, follow
-these steps to make a version with an index:
+Assuming that your document is `foo.adoc`, do
+this to make a version with an index:
 ----
-  $ ruby make_index.rb foo.adoc
-  $ asciidoctor-latex -b html foo-indexed.adoc
+  $ ruby make_index.rb ../examples/foo.adoc
 ----
-The rendered file will be `foo-indexed.html`.
-This example assumes that you are in
-the directory `examples`.
+Execution of this command produces
+two files, `foo-indexed.adoc`
+and `foo-indexed.html`.  Here we assume
+that you in the directory make_index/lib.
+
 
 .Larger Example
 For testing purposes, the 5900-word file
@@ -26,8 +27,7 @@ For testing purposes, the 5900-word file
 It has a few terms marked marked for the
 index.  To play with it, do this:
 ----
-  $  ruby make_index.rb keynes_ch_2.adoc
-  $  asciidoctor-latex keynes_ch_2-indexed.adoc
+  $  ruby make_index.rb ../examples/keynes_ch_2.adoc
 ----
 Then view the file `keynes_ch_2-indexed.html`
 in your browser.
@@ -50,7 +50,7 @@ a gem, you should also
 say
 
 ----
-alias make-index="ruby $HOME/dev/git/asciidoctor-make-index/lib/make_index.rb"
+alias makeindex="ruby $HOME/dev/git/asciidoctor-make-index/lib/make_index.rb"
 ----
 
 Then you can run `make-index foo.adoc` from anywhere.

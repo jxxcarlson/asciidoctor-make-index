@@ -175,7 +175,7 @@ class TextIndex
   # Put it all together: write the transformed
   # Asciidoc file to outfile, along with the index.
   # The output is now ready to be processed by Asciidoctor.
-  def process(outfile)
+  def preprocess(outfile)
     scan
     make_index_map
     make_index

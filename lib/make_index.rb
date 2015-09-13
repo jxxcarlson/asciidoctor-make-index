@@ -25,7 +25,7 @@ def make_index
   ti = TextIndex.new(file: input_file)
   basename = File.basename(input_file, '.adoc')
   output_file = "#{basename}-indexed.adoc"
-  ti.process(output_file)
+  ti.preprocess(output_file)
   `asciidoctor-latex -b html #{output_file}`
 end
 
