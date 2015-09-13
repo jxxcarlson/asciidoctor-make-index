@@ -1,3 +1,9 @@
+
+# Usage:
+# Instantiate with a file  ti = TextIndex.new(file: 'infile.adoc')
+# or instantiate with a string ti = TextIndex.new(string: 'foo, bar, etc')
+# Then execute ti.process('outfile.adoc') to write the indexed version
+# of the Asciidoc file to 'outfile.adoc'
 class TextIndex
 
   attr_reader :text, :lines, :term_array, :index_map, :index_array, :index
@@ -169,7 +175,7 @@ class TextIndex
   # Put it all together: write the transformed
   # Asciidoc file to outfile, along with the index.
   # The output is now ready to be processed by Asciidoctor.
-  def preprocess(outfile)
+  def process(outfile)
     scan
     make_index_map
     make_index
@@ -182,8 +188,3 @@ class TextIndex
   end
 
 end
-
-
-
-
-

@@ -16,7 +16,9 @@ these steps to make a version with an index:
   $ ruby make_index.rb foo.adoc
   $ asciidoctor-latex -b html foo-indexed.adoc
 ----
-The rendered file will be `foo-indexed.html`
+The rendered file will be `foo-indexed.html`.
+This example assumes that you are in
+the directory `examples`.
 
 .Larger Example
 For testing purposes, the 5900-word file
@@ -40,8 +42,11 @@ in your browser.
   $ rake install
 ----
 
+Run tests with `rspec spec/make_index_spec.rb`.
+
 .Stopgap
-Until I get things properly set up, you should also
+Until I get things properly set up build and install
+a gem, you should also
 say
 
 ----
