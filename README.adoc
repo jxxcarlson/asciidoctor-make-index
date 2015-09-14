@@ -18,7 +18,7 @@ this to make a version with an index:
 Execution of this command produces
 two files, `foo-indexed.adoc`
 and `foo-indexed.html`.  Here we assume
-that you in the directory make_index/lib.
+that you in the directory `make_index/lib`.
 
 
 .Larger Example
@@ -68,7 +68,8 @@ It is designed to be syntax-compatible with the
 corresponding feature for Asciidoctor when
 it is released.  At that point,
 `make_index.rb` will be redundant.
-. In the next few days, the index feature will be rolled into
-http://www.noteshare.io[Noteshare.io].  Then the *Show Doc*
+. The index feature has beeb rolled into
+http://www.noteshare.io[Noteshare.io].  The *Show Doc*
 item in the *View* menu will compile the current notebook
 with an index if the attribute `:make_index:` is set.
+See http://www.noteshare.io/section/writing-tools#_index[this document]
