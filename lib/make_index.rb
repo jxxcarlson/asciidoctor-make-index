@@ -21,6 +21,7 @@ def make_index
     puts message
     return
   end
+  puts "HOLA"
   input_file = ARGV[0]
   ti = TextIndex.new(file: input_file)
   basename = File.basename(input_file, '.adoc')

@@ -105,27 +105,146 @@ EOF
 
   end
 
-  context 'expanded index term'  do
+  context 'expanded index term', :expanded  do
 
     before :each do
 
       @text = <<EOF
 This is a test of ((Foo)).
 That is to say, we went to the ((bar)).
-The (((bar stools, stool, bar)))
+The (((stool, bar, bar stools)))
 were very high.
 However, ((Foo)) was nowhere to be found!
 EOF
 
     end
 
+      it 'scans a string, producing and array of its terms', :scan_string2 do
+      str = 'This is a test of ((Foo)). Afterwards we will go to the ((bar))'
+      str << 'and sit on the (((bar stools, stool, bar))).'
+      terms = TextIndex.scan_string(str)
+      expect(terms).to eq(["Foo", "bar", "bar stools, stool, bar"])
+    end
+
     it 'scans the array lines, producing an array of index terms', :scan2  do
 
       ti = TextIndex.new(string: @text)
       ti.scan
-      expect(ti.term_array).to eq(["Foo", "bar", "Foo"])
+      expect(ti.term_array).to eq(["Foo", "bar", "stool, bar, bar stools", "Foo"])
+
+    end
+
+    it 'produces a list of index terms from a piece of text' , :index_map2 do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      expect(ti.index_map).to be_instance_of(Hash)
+      expect(ti.index_map["Foo"]).to eq([0,3])
+      expect(ti.index_map["bar"]).to eq([1])
+      expect(ti.index_map["stool, bar, bar stools"]).to eq([2])
+    end
+
+    it 'transforms a string, replacing terms with the corresponding asciidoc element', :transform_line2 do
+      input = 'This is a test of ((Foo)). Afterwards we will go to the ((bar))'
+      input << ' and sit on the (((stool, bar, bar stools))).'
+      ti = TextIndex.new(string: input)
+      ti.scan
+      ti.make_index_map
+      output = ti.transform_line(input)
+      expected_output =  "This is a test of index_term::['Foo', 0]. Afterwards we will go to the index_term::['bar', 1] and sit on the index_term::['stool, bar, bar stools', 2]."
+      expect(output).to eq(expected_output)
+    end
+
+    it 'transforms an array of lines, writing the output to a file', :transform_lines2 do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      puts 'XXX'
+      puts @index_map.to_s
+      puts 'XXX'
+      ti.transform_lines('out.adoc')
+      output = File.read('out.adoc')
+      expected_output = <<EOF
+This is a test of index_term::['Foo', 0].
+That is to say, we went to the index_term::['bar', 1].
+The index_term::['stool, bar, bar stools', 2]
+were very high.
+However, index_term::['Foo', 3] was nowhere to be found!
+EOF
+      expect(output).to eq(expected_output)
+    end
+
+    it 'creates the data structure for the index', :index_array2  do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      expected_index_array  = [["bar", [1]], ["Foo", [0, 3]], ["stool, bar, bar stools", [2]]]
+      expect(ti.index_array).to eq(expected_index_array)
+
+    end
+
+    it 'creates an Asciidoc version of the index', :ad_version2 do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      ti.make_index
+      expected_index_text = "\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
+      expect(ti.index).to eq(expected_index_text)
+    end
+
+    it 'transforms the marked index terms and appends an index to the generated asciidoc file', :preprocess2 do
+      ti = TextIndex.new(string: @text)
+      ti.preprocess('out.adoc')
+      output = File.read('out.adoc')
+      expected_output = "This is a test of index_term::[Foo, 0].\nThat is to say, we went to the index_term::[bar, 1].\nHowever, index_term::[Foo, 2] was nowhere to be found!\n\n\n:!numbered:\n\n== Index\n\n\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
+      expect(output).to eq(expected_output)
+    end
 
 
+  end
+
+  context 'Arthur' do
+
+    before :each do
+      @text = <<EOF
+The Lady of the Lake, her arm clad in the purest shimmering samite,
+held aloft Excalibur from the bosom of the water,
+signifying by divine providence that I, ((Arthur)),
+was to carry (((Sword, Broadsword, Excalibur))).
+That is why I am your king. Shut up! Will you shut up?!
+Burn her anyway! I'm not a witch.
+Look, my liege! We found them.
+EOF
+    end
+
+
+    it 'produces a list of index terms from a piece of text' , :index_map3 do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      puts ti.index_map
+      expect(ti.index_map).to be_instance_of(Hash)
+      expect(ti.index_map["Arthur"]).to eq([0])
+      expect(ti.index_map["Sword, Broadsword, Excalibur"]).to eq([1])
+    end
+
+    it 'transforms an array of lines, writing the output to a file', :transform_lines3 do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      puts 'XXX'
+      puts @index_map.to_s
+      puts 'XXX'
+      ti.transform_lines('out.adoc')
+      output = File.read('out.adoc')
+      expected_output = <<EOF
+This is a test of index_term::['Foo', 0].
+That is to say, we went to the index_term::['bar', 1].
+The index_term::['stool, bar, bar stools', 2]
+were very high.
+However, index_term::['Foo', 3] was nowhere to be found!
+EOF
+      expect(output).to eq(expected_output)
     end
 
   end

@@ -8,6 +8,8 @@ class TextIndex
 
   attr_reader :text, :lines, :term_array, :index_map, :index_array, :index
 
+  INDEX_TERM_REGEX = /\({2}\(*(.*?)\){2}\)*/
+
   # Construct an array of lines
   # by reading a string or a file:
   # foo = TextIndex.new(string: 'ho ho ho')
@@ -20,20 +22,28 @@ class TextIndex
   # locate the occurrences of terms marked
   # for indexing and return them as an array
   def self.scan_string(str)
-    regex = /\(\((.*?)\)\)/
-    str.scan(regex).flatten
+    str.scan(INDEX_TERM_REGEX).flatten
   end
 
   # Return the terms to be index by
   # scanning the entire @lines array
   def scan
-    regex = /\(\((.*?)\)\)/
     output = []
     @lines.each do |line|
-      term_array = line.scan(regex)
+      term_array = line.scan(INDEX_TERM_REGEX)
       output << term_array
     end
     @term_array = output.flatten
+  end
+
+  def sort_indicator(element)
+    components = element[0].split(',')
+    if components.count == 1
+      components[0].downcase
+    else
+      components.pop
+      components.join(',').strip.downcase
+    end
   end
 
   # Build a hash, the @index_map which maps an index term to an
@@ -65,7 +75,7 @@ class TextIndex
       end
     end
     @index_map = dict
-    @index_array = @index_map.to_a.sort{ |a,b| a[0].downcase <=> b[0].downcase }
+    @index_array = @index_map.to_a.sort{ |a,b| sort_indicator(a) <=> sort_indicator(b) }
   end
 
   # Map in index term to an inline_macro
@@ -93,8 +103,9 @@ class TextIndex
     value = @index_map[term].dup
     if  value
       k = value.shift
+      warn "TERM: #{term}"
       @index_map[term] = value
-      "index_term::[#{term}, #{k}]"
+      "index_term::['#{term}', #{k}]"
     end
   end
 
@@ -104,7 +115,12 @@ class TextIndex
     terms = TextIndex.scan_string(line)
     if terms
       terms.each do |term|
-        line = line.gsub("((#{term}))", transformed_term(term))
+        elements = term.split(',')
+        if elements.count == 1
+          line = line.gsub("((#{term}))", transformed_term(term))
+        else
+          line = line.gsub("(((#{term})))", transformed_term(term))
+        end
       end
     end
     line
@@ -120,6 +136,7 @@ class TextIndex
   def transform_lines(outfile)
     file = File.open(outfile, 'w')
     @lines.each do |line|
+      puts "LINE"
       file.puts transform_line(line)
     end
     file.close
@@ -144,6 +161,11 @@ class TextIndex
   #
   def index_pair_to_index_item(pair)
     reference = pair[0]
+    reference_elements = reference.split(',')
+    if reference_elements.count > 1
+      reference_elements.pop
+      reference = "'#{reference_elements.join(',').strip}'"
+    end
     indices = pair[1].dup
     index = indices.shift
 
@@ -157,7 +179,7 @@ class TextIndex
     end
     out.join(', ') + " +\n"
   end
-  
+
 
   # Insert letter "A", "B", etc in index
   # before first letter of index term changes
@@ -192,6 +214,7 @@ class TextIndex
   # Asciidoc file to outfile, along with the index.
   # The output is now ready to be processed by Asciidoctor.
   def preprocess(outfile)
+    warn 'PREPROCESS'
     scan
     make_index_map
     make_index
