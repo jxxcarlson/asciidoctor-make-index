@@ -97,7 +97,7 @@ EOF
     ti = TextIndex.new(string: @text)
     ti.preprocess('out.adoc')
     output = File.read('out.adoc')
-    expected_output = "This is a test of index_term::[Foo, 0].\nThat is to say, we went to the index_term::[bar, 1].\nHowever, index_term::[Foo, 2] was nowhere to be found!\n\n\n== Index\n\n\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
+    expected_output = "This is a test of index_term::[Foo, 0].\nThat is to say, we went to the index_term::[bar, 1].\nHowever, index_term::[Foo, 2] was nowhere to be found!\n\n\n:!numbered:\n\n== Index\n\n\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
     expect(output).to eq(expected_output)
   end
 

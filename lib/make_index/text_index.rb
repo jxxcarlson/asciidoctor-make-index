@@ -169,6 +169,19 @@ class TextIndex
   end
 
 
+  # Insert letter "A", "B", etc in index
+  # before first letter of index term changes
+  def heading(reference)
+    first_char = reference[0].downcase
+    if first_char =~ /\w/ && first_char != @previous_char
+      @previous_char = first_char
+      "\n\n*#{first_char.upcase}* +\n"
+    else
+      ""
+    end
+  end
+
+
   # Construct the Asciidoc version of the index
   # by applying 'index_pair_to_index_item' to
   # each element and accumulating the result
@@ -195,7 +208,7 @@ class TextIndex
     transform_lines(outfile)
 
     file = File.open(outfile, 'a')
-    file.puts "\n\n== Index\n\n"
+    file.puts "\n\n:!numbered:\n\n== Index\n\n"
     file.puts index
     file.close
   end
