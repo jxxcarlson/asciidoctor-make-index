@@ -157,17 +157,7 @@ class TextIndex
     end
     out.join(', ') + " +\n"
   end
-
-  def heading(reference)
-    first_char = reference[0]
-    if first_char =~ /\w/ && first_char != @previous_char
-      @previous_char = first_char
-      "\n\n*#{first_char.upcase}* +\n"
-    else
-      ""
-    end
-  end
-
+  
 
   # Insert letter "A", "B", etc in index
   # before first letter of index term changes
