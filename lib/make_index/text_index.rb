@@ -158,14 +158,27 @@ class TextIndex
     out.join(', ') + " +\n"
   end
 
+  def heading(reference)
+    first_char = reference[0]
+    if first_char =~ /\w/ && first_char != @previous_char
+      @previous_char = first_char
+      "\n\n*#{first_char.upcase}* +\n"
+    else
+      ""
+    end
+  end
+
 
   # Construct the Asciidoc version of the index
   # by applying 'index_pair_to_index_item' to
-  # each elemnet and accumulating the result
+  # each element and accumulating the result
   # in the string 'output'
   def make_index
     output = ''
+    @previous_char = nil
     @index_array.each do |index_pair|
+      reference = index_pair[0]
+      output << heading(reference)
       output << index_pair_to_index_item(index_pair)
     end
     @index = output
