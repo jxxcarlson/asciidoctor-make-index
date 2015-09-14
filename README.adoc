@@ -5,6 +5,8 @@ an index for Asciidoc documents.  At the
 moment it requires the `Asciidoctor-LaTeX` extension.
 
 
+
+
 Mark terms like this if you want them to appear
 in the document index:
 ----
@@ -19,6 +21,16 @@ Execution of this command produces
 two files, `foo-indexed.adoc`
 and `foo-indexed.html`.  Here we assume
 that you in the directory `make_index/lib`.
+
+https://vschool.s3.amazonaws.com/manuscripts/462.html[Here]
+is an example of an Asciidoc document compiled
+with an index.  And
+http://www.noteshare.io/lessons/index-example-1?remote=true&view_mode=source[here]
+is a place to view the source text if you are
+logged in to Noteshare.  If you wish,
+you can sign up for
+a free account at
+http://www.noteshare.io[Noteshare.io].
 
 
 .Larger Example
