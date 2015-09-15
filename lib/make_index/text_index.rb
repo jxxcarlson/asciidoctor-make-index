@@ -132,16 +132,7 @@ class TextIndex
       terms.each do |term|
         puts "transform_line, term = #{term}".red
         puts "line = #{line}".cyan
-        # puts "transformed_term: #{transformed_term(term)}"
         line = line.gsub("((#{term}))", transformed_term(term))
-=begin
-        elements = term.split(',')
-        if elements.count == 1
-          line = line.gsub("((#{term}))", transformed_term(term))
-        else
-          line = line.gsub("(((#{term})))", transformed_term(term))
-        end
-=end
       end
     end
     line

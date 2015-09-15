@@ -57,8 +57,7 @@ EOF
       ti.scan
       ti.make_index_map
       output = ti.transform_line(input)
-      expected_output = 'This is a test of index_term::[Foo, 0].'
-      expected_output << ' Afterwards we will go to the index_term::[bar, 1].'
+      expected_output =  "This is a test of index_term::['Foo', 0, mark]. Afterwards we will go to the index_term::['bar', 1, mark]."
       expect(output).to eq(expected_output)
     end
 
@@ -70,9 +69,9 @@ EOF
       ti.transform_lines('out.adoc')
       output = File.read('out.adoc')
       expected_output = <<EOF
-This is a test of index_term::[Foo, 0].
-That is to say, we went to the index_term::[bar, 1].
-However, index_term::[Foo, 2] was nowhere to be found!
+This is a test of index_term::['Foo', 0, mark].
+That is to say, we went to the index_term::['bar', 1, mark].
+However, index_term::['Foo', 2, mark] was nowhere to be found!
 EOF
       expect(output).to eq(expected_output)
     end
@@ -99,7 +98,26 @@ EOF
       ti = TextIndex.new(string: @text)
       ti.preprocess('out.adoc')
       output = File.read('out.adoc')
-      expected_output = "This is a test of index_term::[Foo, 0].\nThat is to say, we went to the index_term::[bar, 1].\nHowever, index_term::[Foo, 2] was nowhere to be found!\n\n\n:!numbered:\n\n== Index\n\n\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
+      expected_output = <<EOF
+This is a test of index_term::['Foo', 0, mark].
+That is to say, we went to the index_term::['bar', 1, mark].
+However, index_term::['Foo', 2, mark] was nowhere to be found!
+
+
+:!numbered:
+
+== Index
+
+
+
+*B* +
+<<index_term_1, bar>> +
+
+
+*F* +
+<<index_term_0, Foo>>, <<index_term_2, 2>> +
+EOF
+
       expect(output).to eq(expected_output)
     end
 
@@ -123,14 +141,14 @@ EOF
       str = 'This is a test of ((Foo)). Afterwards we will go to the ((bar))'
       str << 'and sit on the (((bar stools, stool, bar))).'
       terms = TextIndex.scan_string(str)
-      expect(terms).to eq(["Foo", "bar", "bar stools, stool, bar"])
+      expect(terms).to eq(["Foo", "bar", "(bar stools, stool, bar)"])
     end
 
     it 'scans the array lines, producing an array of index terms', :scan2  do
 
       ti = TextIndex.new(string: @text)
       ti.scan
-      expect(ti.term_array).to eq(["Foo", "bar", "stool, bar, bar stools", "Foo"])
+      expect(ti.term_array).to eq(["Foo", "bar", "(stool, bar, bar stools)", "Foo"])
 
     end
 
@@ -141,7 +159,7 @@ EOF
       expect(ti.index_map).to be_instance_of(Hash)
       expect(ti.index_map["Foo"]).to eq([0,3])
       expect(ti.index_map["bar"]).to eq([1])
-      expect(ti.index_map["stool, bar, bar stools"]).to eq([2])
+      expect(ti.index_map["(stool, bar, bar stools)"]).to eq([2])
     end
 
     it 'transforms a string, replacing terms with the corresponding asciidoc element', :transform_line2 do
@@ -151,7 +169,7 @@ EOF
       ti.scan
       ti.make_index_map
       output = ti.transform_line(input)
-      expected_output =  "This is a test of index_term::['Foo', 0]. Afterwards we will go to the index_term::['bar', 1] and sit on the index_term::['stool, bar, bar stools', 2]."
+      expected_output =   "This is a test of index_term::['Foo', 0, mark]. Afterwards we will go to the index_term::['bar', 1, mark] and sit on the index_term::['stool, bar, bar stools', 2, invisible]."
       expect(output).to eq(expected_output)
     end
 
@@ -165,11 +183,11 @@ EOF
       ti.transform_lines('out.adoc')
       output = File.read('out.adoc')
       expected_output = <<EOF
-This is a test of index_term::['Foo', 0].
-That is to say, we went to the index_term::['bar', 1].
-The index_term::['stool, bar, bar stools', 2]
+This is a test of index_term::['Foo', 0, mark].
+That is to say, we went to the index_term::['bar', 1, mark].
+The index_term::['stool, bar, bar stools', 2, invisible]
 were very high.
-However, index_term::['Foo', 3] was nowhere to be found!
+However, index_term::['Foo', 3, mark] was nowhere to be found!
 EOF
       expect(output).to eq(expected_output)
     end
@@ -188,7 +206,7 @@ EOF
       ti.scan
       ti.make_index_map
       ti.make_index
-      expected_index_text = "\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
+      expected_index_text = "\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_3, 2>> +\n\n\n*S* +\n<<index_term_2, stool, bar>> +\n"
       expect(ti.index).to eq(expected_index_text)
     end
 
@@ -196,7 +214,31 @@ EOF
       ti = TextIndex.new(string: @text)
       ti.preprocess('out.adoc')
       output = File.read('out.adoc')
-      expected_output = "This is a test of index_term::[Foo, 0].\nThat is to say, we went to the index_term::[bar, 1].\nHowever, index_term::[Foo, 2] was nowhere to be found!\n\n\n:!numbered:\n\n== Index\n\n\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
+      expected_output = <<EOF
+This is a test of index_term::['Foo', 0, mark].
+That is to say, we went to the index_term::['bar', 1, mark].
+The index_term::['stool, bar, bar stools', 2, invisible]
+were very high.
+However, index_term::['Foo', 3, mark] was nowhere to be found!
+
+
+:!numbered:
+
+== Index
+
+
+
+*B* +
+<<index_term_1, bar>> +
+
+
+*F* +
+<<index_term_0, Foo>>, <<index_term_3, 2>> +
+
+
+*S* +
+<<index_term_2, stool, bar>> +
+EOF
       expect(output).to eq(expected_output)
     end
 
@@ -224,8 +266,9 @@ EOF
       ti.make_index_map
       puts ti.index_map
       expect(ti.index_map).to be_instance_of(Hash)
+      puts "INDEX MAP: #{ti.index_map.to_s.red}"
       expect(ti.index_map["Arthur"]).to eq([0])
-      expect(ti.index_map["Sword, Broadsword, Excalibur"]).to eq([1])
+      expect(ti.index_map["(Sword, Broadsword, Excalibur)"]).to eq([1])
     end
 
     it 'transforms an array of lines, writing the output to a file', :transform_lines3 do
@@ -238,11 +281,13 @@ EOF
       ti.transform_lines('out.adoc')
       output = File.read('out.adoc')
       expected_output = <<EOF
-This is a test of index_term::['Foo', 0].
-That is to say, we went to the index_term::['bar', 1].
-The index_term::['stool, bar, bar stools', 2]
-were very high.
-However, index_term::['Foo', 3] was nowhere to be found!
+The Lady of the Lake, her arm clad in the purest shimmering samite,
+held aloft Excalibur from the bosom of the water,
+signifying by divine providence that I, index_term::['Arthur', 0, mark],
+was to carry index_term::['Sword, Broadsword, Excalibur', 1, invisible].
+That is why I am your king. Shut up! Will you shut up?!
+Burn her anyway! I'm not a witch.
+Look, my liege! We found them.
 EOF
       expect(output).to eq(expected_output)
     end
