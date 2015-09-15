@@ -171,6 +171,7 @@ class TextIndex
 
     n = indices.count - 1
     count = 2
+    reference = reference.gsub("''", "")  #Fixme: this is sloppy!
     out = ["<<index_term_#{index}, #{reference}>>"]
     if indices
       indices.each do |index|
