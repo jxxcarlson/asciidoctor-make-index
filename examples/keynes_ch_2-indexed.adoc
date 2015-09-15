@@ -2,6 +2,9 @@
 John Maynard Keynes
 :toc2:
 
+
+index_term::['Postulates', 0, invisible]
+
 == Chapter 2: The Postulates of the Classical Economics
 
 MOST treatises on the theory of value and
@@ -12,6 +15,8 @@ conditions which, assuming the employment of this
 quantity of resources, determine their relative
 rewards and the relative values of their
 products.[1]
+
+index_term::['resources, volume of, foo bar', 1, mark]
 
 The question, also, of the volume of the available
 resources, in the sense of the size of the
@@ -32,13 +37,13 @@ mention.[2]
 
 === Section I
 
-The index_term::[classical theory of employment, 0] — supposedly
+The index_term::['classical theory of employment', 2, mark] — supposedly
 simple and obvious — has been based. I think, on
 two fundamental postulates, though practically
 without discussion, namely:
 
 . The wage is equal to the
-index_term::[marginal product of labour, 1]
+index_term::['marginal product of labour', 3, mark]
 +
 That is to say, the wage of an employed person is
 equal to the value which would be lost if
@@ -69,7 +74,7 @@ accept a wage which had to them a utility below a
 certain minimum.
 
 This postulate is compatible with what may be
-called index_term::[’frictional’ unemployment, 2]. For a realistic
+called index_term::['’frictional’ unemployment', 4, mark]. For a realistic
 interpretation of it legitimately allows for
 various inexactnesses of adjustment which stand in
 the way of continuous full employment: for
@@ -856,8 +861,27 @@ his theory.
 https://www.marxists.org/reference/subject/economics/keynes/general-theory/ch02.htm[Source]
 
 
+:!numbered:
+
 == Index
 
-<<index_term_0, classical theory of employment>> +
-<<index_term_1, marginal product of labour>> +
-<<index_term_2, ’frictional’ unemployment>> +
+
+
+*C* +
+<<index_term_2, classical theory of employment>> +
+
+
+*F* +
+<<index_term_4, frictional unemployment>> +
+
+
+*M* +
+<<index_term_3, marginal product of labour>> +
+
+
+*P* +
+<<index_term_0, Postulates>> +
+
+
+*R* +
+<<index_term_1, resources, volume of>> +

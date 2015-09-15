@@ -2,6 +2,9 @@
 John Maynard Keynes
 :toc2:
 
+
+(((Postulates)))
+
 == Chapter 2: The Postulates of the Classical Economics
 
 MOST treatises on the theory of value and
@@ -12,6 +15,8 @@ conditions which, assuming the employment of this
 quantity of resources, determine their relative
 rewards and the relative values of their
 products.[1]
+
+((resources, volume of, foo bar))
 
 The question, also, of the volume of the available
 resources, in the sense of the size of the

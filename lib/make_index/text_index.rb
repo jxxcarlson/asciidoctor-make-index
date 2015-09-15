@@ -6,9 +6,11 @@
 # of the Asciidoc file to 'outfile.adoc'
 class TextIndex
 
+  require_relative 'core_ext'
+
   attr_reader :text, :lines, :term_array, :index_map, :index_array, :index
 
-  INDEX_TERM_REGEX = /\({2}\(*(.*?)\){2}\)*/
+  INDEX_TERM_REGEX = /(\({2}\(*.*?\){2}\)*)/
 
   # Construct an array of lines
   # by reading a string or a file:
@@ -19,13 +21,14 @@ class TextIndex
     @lines = IO.readlines(hash[:file]) if hash[:file]
   end
 
+
   # locate the occurrences of terms marked
   # for indexing and return them as an array
   def self.scan_string(str)
-    str.scan(INDEX_TERM_REGEX).flatten
+    str.scan(INDEX_TERM_REGEX).flatten.map{ |e| e.sub('((','').sub('))','') }
   end
 
-  # Return the terms to be index by
+  # Return the terms to be indexwd by
   # scanning the entire @lines array
   def scan
     output = []
@@ -33,7 +36,7 @@ class TextIndex
       term_array = line.scan(INDEX_TERM_REGEX)
       output << term_array
     end
-    @term_array = output.flatten
+    @term_array = output.flatten.map{ |e| e.sub('((','').sub('))','') }
   end
 
   def sort_indicator(element)
@@ -75,7 +78,11 @@ class TextIndex
       end
     end
     @index_map = dict
-    @index_array = @index_map.to_a.sort{ |a,b| sort_indicator(a) <=> sort_indicator(b) }
+    # @index_array = @index_map.to_a.sort{ |a,b| sort_indicator(a) <=> sort_indicator(b) }
+    @index_array = @index_map.to_a
+    @index_array = @index_array.map{ |el| [el[0].gsub(/[^\w, ]/,''), el[1]]} # reduce
+    @index_array = @index_array.sort{ |a,b| sort_indicator(a) <=> sort_indicator(b) }
+    puts @index_array
   end
 
   # Map in index term to an inline_macro
@@ -103,9 +110,17 @@ class TextIndex
     value = @index_map[term].dup
     if  value
       k = value.shift
-      warn "TERM: #{term}"
       @index_map[term] = value
-      "index_term::['#{term}', #{k}]"
+      regex = /\((.*?)\)/
+      matches = term.match regex
+      css = 'mark'
+      if matches
+        term = matches[1]
+        css = 'invisible'
+      end
+      value =  "index_term::['#{term}', #{k}, #{css}]"
+      puts "INDEX TERM A: #{value}"
+      value
     end
   end
 
@@ -115,12 +130,18 @@ class TextIndex
     terms = TextIndex.scan_string(line)
     if terms
       terms.each do |term|
+        puts "transform_line, term = #{term}".red
+        puts "line = #{line}".cyan
+        # puts "transformed_term: #{transformed_term(term)}"
+        line = line.gsub("((#{term}))", transformed_term(term))
+=begin
         elements = term.split(',')
         if elements.count == 1
           line = line.gsub("((#{term}))", transformed_term(term))
         else
           line = line.gsub("(((#{term})))", transformed_term(term))
         end
+=end
       end
     end
     line
@@ -136,7 +157,6 @@ class TextIndex
   def transform_lines(outfile)
     file = File.open(outfile, 'w')
     @lines.each do |line|
-      puts "LINE"
       file.puts transform_line(line)
     end
     file.close
@@ -159,23 +179,40 @@ class TextIndex
   # 2, 3, ..., n.  We should loook for a better
   # solution in the pageless environment of the web.
   #
-  def index_pair_to_index_item(pair)
-    reference = pair[0]
-    reference_elements = reference.split(',')
-    if reference_elements.count > 1
+  def reference(str)
+    reference_elements = str.split(',')
+    if reference_elements.count == 1
+      # case 'foo', return 'foo'
+      ref = reference_elements.pop
+    else
+      # case 'foo, bar, foo bar', return 'foo, bar'
+      # case 'foo, - , foo bar', retur 'foo'
       reference_elements.pop
-      reference = "'#{reference_elements.join(',').strip}'"
+      last_element = reference_elements.pop.strip
+      puts "last_element = #{last_element}".red
+      if last_element == '-'
+        puts "INSIDE: reference = #{last_element}".cyan
+        ref = reference_elements.pop
+      else
+        reference_elements.push last_element
+        ref = "'#{reference_elements.join(', ').strip}'"
+      end
     end
+    return ref.gsub("'", '')  #Fixme: this is sloppy!
+  end
+
+  def index_pair_to_index_item(pair)
+    ref = reference(pair[0])
     indices = pair[1].dup
     index = indices.shift
 
     n = indices.count - 1
     count = 2
-    reference = reference.gsub("''", "")  #Fixme: this is sloppy!
-    out = ["<<index_term_#{index}, #{reference}>>"]
+    out = ["<<index_term_#{index}, #{ref}>>"]
     if indices
       indices.each do |index|
         out <<  "<<index_term_#{index}, #{count}>>"
+        count += 1
       end
     end
     out.join(', ') + " +\n"
@@ -215,7 +252,6 @@ class TextIndex
   # Asciidoc file to outfile, along with the index.
   # The output is now ready to be processed by Asciidoctor.
   def preprocess(outfile)
-    warn 'PREPROCESS'
     scan
     make_index_map
     make_index
