@@ -7,6 +7,7 @@
 class TextIndex
 
   require_relative 'core_ext'
+  require 'ostruct'
 
   attr_reader :text, :lines, :term_array, :index_map, :index_array, :index
 
@@ -82,6 +83,7 @@ class TextIndex
     @index_array = @index_map.to_a
     @index_array = @index_array.map{ |el| [el[0].gsub(/[^\w, ]/,''), el[1]]} # reduce
     @index_array = @index_array.sort{ |a,b| sort_indicator(a) <=> sort_indicator(b) }
+    @index_array = @index_array.map{ |e| [e[0].split(/, */), e[1]]}
     puts @index_array
   end
 
@@ -170,8 +172,7 @@ class TextIndex
   # 2, 3, ..., n.  We should loook for a better
   # solution in the pageless environment of the web.
   #
-  def reference(str)
-    reference_elements = str.split(',')
+  def reference(reference_elements)
     if reference_elements.count == 1
       # case 'foo', return 'foo'
       ref = reference_elements.pop
@@ -209,14 +210,45 @@ class TextIndex
     out.join(', ') + " +\n"
   end
 
+  def shift_pair(pair)
+    pair[0].shift
+  end
+
+  def index_pair_to_index_item3(pair, level)
+    reference_list, index_list = pair
+    length = reference_list.count
+    puts "head #{reference_list[0].to_s}, level = #{level}, length = #{length}".red
+    if length == 1
+      value= "* <<index_term_#{index_list.shift}, #{reference_list.shift}>>\n"
+    else
+      head = reference_list.shift
+      asterisks = '*'*(level)
+      value = "* #{head}\n#{asterisks}#{index_pair_to_index_item3([reference_list, index_list], level + 1)}"
+    end
+    return value
+  end
+
 
   # Insert letter "A", "B", etc in index
   # before first letter of index term changes
-  def heading(reference)
-    first_char = reference[0].downcase
+  def heading(reference_list)
+    first_char = reference_list[0][0].downcase
+    puts "first_char = #{first_char}".magenta
     if first_char =~ /\w/ && first_char != @previous_char
       @previous_char = first_char
       "\n\n*#{first_char.upcase}* +\n"
+    else
+      ""
+    end
+  end
+
+  # Insert letter "A", "B", etc in index
+  # before first letter of index term changes
+  def heading2(reference_list)
+    first_char = reference_list[0][0].downcase
+    if first_char =~ /\w/ && first_char != @previous_char
+      @previous_char = first_char
+      "\n\n.*#{first_char.upcase}*\n"
     else
       ""
     end
@@ -231,10 +263,28 @@ class TextIndex
     output = ''
     @previous_char = nil
     @index_array.each do |index_pair|
-      reference = index_pair[0]
-      output << heading(reference)
+      reference_list = index_pair[0]
+      output << heading(reference_list)
       output << index_pair_to_index_item(index_pair)
     end
+    @index = output
+  end
+
+  # Construct the Asciidoc version of the index
+  # by applying 'index_pair_to_index_item' to
+  # each element and accumulating the result
+  # in the string 'output'
+  def make_index2
+    output = ''
+    @previous_char = nil
+    @index_array.each do |index_pair|
+      reference_list = index_pair[0]
+      output << heading2(reference_list)
+      puts index_pair.to_s.yellow
+      @running_head = index_pair[0][0]
+      output << index_pair_to_index_item3(index_pair, 1)
+    end
+    puts output.yellow
     @index = output
   end
 

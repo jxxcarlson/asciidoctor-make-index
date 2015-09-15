@@ -80,7 +80,18 @@ EOF
       ti = TextIndex.new(string: @text)
       ti.scan
       ti.make_index_map
-      expected_index_array  = [['bar', [1]], ['Foo', [0,2]]]
+      expected_index_array  = [[["bar"], [1]], [["Foo"], [0, 2]]]
+      expect(ti.index_array).to eq(expected_index_array)
+
+    end
+
+
+    it 'creates the data structure for the index', :xindex_array  do
+      str = "((foo)), (((foo, bar))), (((foo, bar, baz)))"
+      ti = TextIndex.new(string: str)
+      ti.scan
+      ti.make_index_map
+      expected_index_array  = [[["foo"], [0]], [["foo", "bar"], [1]], [["foo", "bar", "baz"], [2]]]
       expect(ti.index_array).to eq(expected_index_array)
 
     end
@@ -196,7 +207,7 @@ EOF
       ti = TextIndex.new(string: @text)
       ti.scan
       ti.make_index_map
-      expected_index_array  = [["bar", [1]], ["Foo", [0, 3]], ["stool, bar, bar stools", [2]]]
+      expected_index_array  = [[["bar"], [1]], [["Foo"], [0, 3]], [["stool", "bar", "bar stools"], [2]]]
       expect(ti.index_array).to eq(expected_index_array)
 
     end
@@ -292,6 +303,86 @@ EOF
       expect(output).to eq(expected_output)
     end
 
+
+
+  end
+
+  context 'uppity', :uppity  do
+
+    before :each do
+
+      @text = <<EOF
+This is a test of ((Foo)).
+That is to say, we went to the
+EZ Drinker (((bar, neighborhood))).
+The EZ Drinker bar stools (((stool, bar, bar stools)))
+were very high.
+Sadly, ((Foo)) was nowhere to be found!
+EOF
+
+      @text2 = <<EOF
+This is a test of ((Foo)).
+That is to say, we went to the
+EZ Drinker (((bar, neighborhood))).
+The EZ Drinker bar stools (((stool, bar, bar stools)))
+were very high.
+Sadly, ((Foo)) was nowhere to be found!
+Fred said that he had gone to
+(((bar, commercial)))
+Alito's Hangout.
+EOF
+
+
+
+    end
+
+    it 'produces a list of index terms from a piece of text' , :index_map4 do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      puts ti.index_map
+      expect(ti.index_map).to be_instance_of(Hash)
+      puts "INDEX MAP: #{ti.index_map.to_s.red}"
+      expect(ti.index_map["Foo"]).to eq([0, 3])
+      expect(ti.index_map["(bar, neighborhood)"]).to eq([1])
+      expect(ti.index_map["(stool, bar, bar stools)"]).to eq([2])
+    end
+
+    it 'transforms an array of lines, writing the output to a file', :transform_lines4 do
+      ti = TextIndex.new(string: @text)
+      ti.scan
+      ti.make_index_map
+      puts @index_map.to_s.red
+      ti.transform_lines('out.adoc')
+      output = File.read('out.adoc')
+      expected_output = <<EOF
+This is a test of index_term::['Foo', 0, mark].
+That is to say, we went to the
+EZ Drinker index_term::['bar, neighborhood', 1, invisible].
+The EZ Drinker bar stools index_term::['stool, bar, bar stools', 2, invisible]
+were very high.
+Sadly, index_term::['Foo', 3, mark] was nowhere to be found!
+EOF
+      expect(output).to eq(expected_output)
+    end
+
+
+    it 'creates an Asciidoc version of the index', :ad_version4 do
+      ti = TextIndex.new(string: @text2)
+      ti.scan
+      ti.make_index_map
+      ti.make_index2
+      puts 'MAP'.red
+      puts ti.index_map.to_s.red
+      puts 'ARRAY'.cyan
+      puts ti.index_array.to_s.cyan
+      puts 'END'.yellow
+      expected_index_text =  '' # "\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_3, 2>> +\n\n\n*S* +\n<<index_term_2, stool, bar>> +\n"
+      expect(ti.index).to eq(expected_index_text)
+      ti.index
+    end
+
   end
 
 end
+
