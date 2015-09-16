@@ -2,16 +2,43 @@
 
 `make_index` is a Ruby program for generating
 an index for Asciidoc documents.  At the
-moment it requires the `Asciidoctor-LaTeX` extension.
+moment it requires the `Asciidoctor-LaTeX` extension.footnote:[The
+dependence is entirely on the use of the inline macro
+`index_term`, as in  `index_term::['Arthur', 0]`
+or `index_term::['Sword, Broadsword, Excalibur', 1]`.  Some css
+is also required. ]
 
 
 
-
-Mark terms like this if you want them to appear
+Mark terms as in the following examples if you want them to appear
 in the document index:
 ----
    ((potrezebie))
 ----
+The index term will be displayed in red in the text and will
+appear in the index as a hyperlink to the given term
+
+Use the following syntax to produce entries in the index
+without visibly altering the renderd text.   However, the
+index entries thus make are links back to the original
+text.  See the file `keynes_ch_2-indexed.adoc` for
+examples
+
+* `+(((Postulates of Economic Theory)))+`
+* `+(((Theory, Postulates of)))+`
+* `+(((Theory, Economic, Postulates of)))+`
+
+The corresponding index entries are
+----
+Postulates of Economic Theory
+Theory
+  Postulates of
+Theory
+  Economic
+    Postulates of
+----
+
+
 Assuming that your document is `foo.adoc`, do
 this to make a version with an index:
 ----

@@ -16,7 +16,7 @@ quantity of resources, determine their relative
 rewards and the relative values of their
 products.[1]
 
-((resources, volume of, foo bar))
+(((resources, volume of, available)))
 
 The question, also, of the volume of the available
 resources, in the sense of the size of the
@@ -43,7 +43,7 @@ two fundamental postulates, though practically
 without discussion, namely:
 
 . The wage is equal to the
-((marginal product of labour))
+(((labour, marginal product)))
 +
 That is to say, the wage of an employed person is
 equal to the value which would be lost if
@@ -54,6 +54,7 @@ qualification that the equality may be disturbed,
 in accordance with certain principles, if
 competition and markets are imperfect.
 
+(((wage, utility)))
 . The utility of the wage when a given volume of
 labour is employed is equal to the marginal
 disutility of that amount of employment.
@@ -119,6 +120,7 @@ possible means of increasing employment:
 . An improvement in organisation or in foresight
 which diminishes ‘frictional’ unemployment;
 
+(((labour, marginal disutility)))
 . a decrease in the marginal disutility of
 labour, as expressed by the real wage for which.
 additional labour is available, so as to diminish

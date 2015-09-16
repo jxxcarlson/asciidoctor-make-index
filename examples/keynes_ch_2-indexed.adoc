@@ -16,7 +16,7 @@ quantity of resources, determine their relative
 rewards and the relative values of their
 products.[1]
 
-index_term::['resources, volume of, foo bar', 1, mark]
+index_term::['resources, volume of, available', 1, invisible]
 
 The question, also, of the volume of the available
 resources, in the sense of the size of the
@@ -43,7 +43,7 @@ two fundamental postulates, though practically
 without discussion, namely:
 
 . The wage is equal to the
-index_term::['marginal product of labour', 3, mark]
+index_term::['labour, marginal product', 3, invisible]
 +
 That is to say, the wage of an employed person is
 equal to the value which would be lost if
@@ -54,6 +54,7 @@ qualification that the equality may be disturbed,
 in accordance with certain principles, if
 competition and markets are imperfect.
 
+index_term::['wage, utility', 4, invisible]
 . The utility of the wage when a given volume of
 labour is employed is equal to the marginal
 disutility of that amount of employment.
@@ -74,7 +75,7 @@ accept a wage which had to them a utility below a
 certain minimum.
 
 This postulate is compatible with what may be
-called index_term::['’frictional’ unemployment', 4, mark]. For a realistic
+called index_term::['’frictional’ unemployment', 5, mark]. For a realistic
 interpretation of it legitimately allows for
 various inexactnesses of adjustment which stand in
 the way of continuous full employment: for
@@ -119,6 +120,7 @@ possible means of increasing employment:
 . An improvement in organisation or in foresight
 which diminishes ‘frictional’ unemployment;
 
+index_term::['labour, marginal disutility', 6, invisible]
 . a decrease in the marginal disutility of
 labour, as expressed by the real wage for which.
 additional labour is available, so as to diminish
@@ -865,23 +867,36 @@ https://www.marxists.org/reference/subject/economics/keynes/general-theory/ch02.
 
 == Index
 
+[.index_style]
+--
 
 
-*C* +
-<<index_term_2, classical theory of employment>> +
+.C
+* <<index_term_2, classical theory of employment>>
 
 
-*F* +
-<<index_term_4, frictional unemployment>> +
+.F
+* <<index_term_5, frictional unemployment>>
 
 
-*M* +
-<<index_term_3, marginal product of labour>> +
+.L
+* labour
+** <<index_term_6, marginal disutility>>
+** <<index_term_3, marginal product>>
 
 
-*P* +
-<<index_term_0, Postulates>> +
+.P
+* <<index_term_0, Postulates>>
 
 
-*R* +
-<<index_term_1, resources, volume of>> +
+.R
+* resources
+** volume of
+*** <<index_term_1, available>>
+
+
+.W
+* wage
+** <<index_term_4, utility>>
+
+--

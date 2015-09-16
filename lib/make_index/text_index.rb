@@ -84,7 +84,6 @@ class TextIndex
     @index_array = @index_array.map{ |el| [el[0].gsub(/[^\w, ]/,''), el[1]]} # reduce
     @index_array = @index_array.sort{ |a,b| sort_indicator(a) <=> sort_indicator(b) }
     @index_array = @index_array.map{ |e| [e[0].split(/, */), e[1]]}
-    puts @index_array
   end
 
   # Map in index term to an inline_macro
@@ -121,7 +120,6 @@ class TextIndex
         css = 'invisible'
       end
       value =  "index_term::['#{term}', #{k}, #{css}]"
-      puts "INDEX TERM A: #{value}"
       value
     end
   end
@@ -132,8 +130,6 @@ class TextIndex
     terms = TextIndex.scan_string(line)
     if terms
       terms.each do |term|
-        puts "transform_line, term = #{term}".red
-        puts "line = #{line}".cyan
         line = line.gsub("((#{term}))", transformed_term(term))
       end
     end
@@ -181,9 +177,7 @@ class TextIndex
       # case 'foo, - , foo bar', retur 'foo'
       reference_elements.pop
       last_element = reference_elements.pop.strip
-      puts "last_element = #{last_element}".red
       if last_element == '-'
-        puts "INSIDE: reference = #{last_element}".cyan
         ref = reference_elements.pop
       else
         reference_elements.push last_element
@@ -193,38 +187,32 @@ class TextIndex
     return ref.gsub("'", '')  #Fixme: this is sloppy!
   end
 
-  def index_pair_to_index_item(pair)
-    ref = reference(pair[0])
-    indices = pair[1].dup
-    index = indices.shift
-
-    n = indices.count - 1
-    count = 2
-    out = ["<<index_term_#{index}, #{ref}>>"]
-    if indices
-      indices.each do |index|
-        out <<  "<<index_term_#{index}, #{count}>>"
-        count += 1
-      end
-    end
-    out.join(', ') + " +\n"
-  end
-
   def shift_pair(pair)
     pair[0].shift
   end
 
-  def index_pair_to_index_item3(pair, level)
+  def index_pair_to_index_item(pair, level)
     reference_list, index_list = pair
     length = reference_list.count
-    puts "head #{reference_list[0].to_s}, level = #{level}, length = #{length}".red
+    head1 = reference_list[0]
+
     if length == 1
       value= "* <<index_term_#{index_list.shift}, #{reference_list.shift}>>\n"
     else
       head = reference_list.shift
       asterisks = '*'*(level)
-      value = "* #{head}\n#{asterisks}#{index_pair_to_index_item3([reference_list, index_list], level + 1)}"
+      if level == 1 and @running_head == head
+        value = "#{asterisks}#{index_pair_to_index_item([reference_list, index_list], level + 1)}"
+      else
+        @running_head = head
+        value = "* #{head}\n#{asterisks}#{index_pair_to_index_item([reference_list, index_list], level + 1)}"
+      end
     end
+
+    if level == 1 and head1 != @running_head
+      @running_head = head1
+    end
+
     return value
   end
 
@@ -233,22 +221,9 @@ class TextIndex
   # before first letter of index term changes
   def heading(reference_list)
     first_char = reference_list[0][0].downcase
-    puts "first_char = #{first_char}".magenta
     if first_char =~ /\w/ && first_char != @previous_char
       @previous_char = first_char
-      "\n\n*#{first_char.upcase}* +\n"
-    else
-      ""
-    end
-  end
-
-  # Insert letter "A", "B", etc in index
-  # before first letter of index term changes
-  def heading2(reference_list)
-    first_char = reference_list[0][0].downcase
-    if first_char =~ /\w/ && first_char != @previous_char
-      @previous_char = first_char
-      "\n\n.*#{first_char.upcase}*\n"
+      "\n\n.#{first_char.upcase}\n"
     else
       ""
     end
@@ -262,32 +237,55 @@ class TextIndex
   def make_index
     output = ''
     @previous_char = nil
+    @running_head = 'X'
     @index_array.each do |index_pair|
       reference_list = index_pair[0]
       output << heading(reference_list)
-      output << index_pair_to_index_item(index_pair)
+      output << index_pair_to_index_item(index_pair, 1)
     end
     @index = output
   end
 
-  # Construct the Asciidoc version of the index
-  # by applying 'index_pair_to_index_item' to
-  # each element and accumulating the result
-  # in the string 'output'
-  def make_index2
-    output = ''
-    @previous_char = nil
-    @index_array.each do |index_pair|
-      reference_list = index_pair[0]
-      output << heading2(reference_list)
-      puts index_pair.to_s.yellow
-      @running_head = index_pair[0][0]
-      output << index_pair_to_index_item3(index_pair, 1)
-    end
-    puts output.yellow
-    @index = output
-  end
+  @@css = <<EOF
+++++
+<style>
+.index_term {
 
+  color: darkred;
+}
+
+
+/* use for targets of index items */
+    .invisible {
+  color: #fff;
+      font-size: 1pt;
+}
+
+
+.index_style ul {
+
+               list-style-type: none;
+               padding:0;
+               margin:0;
+               margin-left:1em;
+             }
+
+.index_style p {
+
+               padding:0;
+               margin:0;
+               line-height: 1.4em;
+               font-size:1.0em;
+             }
+
+.index_style .title {
+
+  font-weight:bold;
+  margin-top:1em;
+}
+</style>
+++++
+EOF
 
   # Put it all together: write the transformed
   # Asciidoc file to outfile, along with the index.
@@ -295,12 +293,16 @@ class TextIndex
   def preprocess(outfile)
     scan
     make_index_map
-    make_index
     transform_lines(outfile)
+    make_index
+
 
     file = File.open(outfile, 'a')
     file.puts "\n\n:!numbered:\n\n== Index\n\n"
+    # file.puts @@css
+    file.puts "[.index_style]\n--\n"
     file.puts index
+    file.puts "\n--\n"
     file.close
   end
 

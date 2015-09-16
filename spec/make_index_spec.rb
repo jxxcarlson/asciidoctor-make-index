@@ -101,7 +101,7 @@ EOF
       ti.scan
       ti.make_index_map
       ti.make_index
-      expected_index_text = "\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_2, 2>> +\n"
+      expected_index_text = "\n\n.B\n* <<index_term_1, bar>>\n\n\n.F\n* <<index_term_0, Foo>>\n"
       expect(ti.index).to eq(expected_index_text)
     end
 
@@ -119,14 +119,18 @@ However, index_term::['Foo', 2, mark] was nowhere to be found!
 
 == Index
 
+[.index_style]
+--
 
 
-*B* +
-<<index_term_1, bar>> +
+.B
+* <<index_term_1, bar>>
 
 
-*F* +
-<<index_term_0, Foo>>, <<index_term_2, 2>> +
+.F
+* <<index_term_0, Foo>>
+
+--
 EOF
 
       expect(output).to eq(expected_output)
@@ -217,7 +221,7 @@ EOF
       ti.scan
       ti.make_index_map
       ti.make_index
-      expected_index_text = "\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_3, 2>> +\n\n\n*S* +\n<<index_term_2, stool, bar>> +\n"
+      expected_index_text = "\n\n.B\n* <<index_term_1, bar>>\n\n\n.F\n* <<index_term_0, Foo>>\n\n\n.S\n* stool\n** bar\n*** <<index_term_2, bar stools>>\n"
       expect(ti.index).to eq(expected_index_text)
     end
 
@@ -237,18 +241,24 @@ However, index_term::['Foo', 3, mark] was nowhere to be found!
 
 == Index
 
+[.index_style]
+--
 
 
-*B* +
-<<index_term_1, bar>> +
+.B
+* <<index_term_1, bar>>
 
 
-*F* +
-<<index_term_0, Foo>>, <<index_term_3, 2>> +
+.F
+* <<index_term_0, Foo>>
 
 
-*S* +
-<<index_term_2, stool, bar>> +
+.S
+* stool
+** bar
+*** <<index_term_2, bar stools>>
+
+--
 EOF
       expect(output).to eq(expected_output)
     end
@@ -371,13 +381,13 @@ EOF
       ti = TextIndex.new(string: @text2)
       ti.scan
       ti.make_index_map
-      ti.make_index2
+      ti.make_index
       puts 'MAP'.red
       puts ti.index_map.to_s.red
       puts 'ARRAY'.cyan
       puts ti.index_array.to_s.cyan
       puts 'END'.yellow
-      expected_index_text =  '' # "\n\n*B* +\n<<index_term_1, bar>> +\n\n\n*F* +\n<<index_term_0, Foo>>, <<index_term_3, 2>> +\n\n\n*S* +\n<<index_term_2, stool, bar>> +\n"
+      expected_index_text = "\n\n.B\n* bar\n** <<index_term_4, commercial>>\n** <<index_term_1, neighborhood>>\n\n\n.F\n* <<index_term_0, Foo>>\n\n\n.S\n* stool\n** bar\n*** <<index_term_2, bar stools>>\n"
       expect(ti.index).to eq(expected_index_text)
       ti.index
     end
