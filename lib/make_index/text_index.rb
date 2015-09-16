@@ -60,7 +60,7 @@ class TextIndex
   #
   # After the @index_map is contructed, it is used
   # to build @index_array -- the corresponding
-  # array which is case-insenstive sorted on the
+  # array which is case-insensitive sorted on the
   # index terms.  Thus
   #
   #   @index_array = [ ['bar', [1]], ['foo', [0, 2]] ]

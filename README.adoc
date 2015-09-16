@@ -111,3 +111,46 @@ http://www.noteshare.io[Noteshare.io].  The *Show Doc*
 item in the *View* menu will compile the current notebook
 with an index if the attribute `:make_index:` is set.
 See http://www.noteshare.io/section/writing-tools#_index[this document]
+
+=== Technical synopsis
+
+`make_index` operates in the following way.  First, it
+reads the source file, breaking it into `@lines`, an array of lines.
+This array is scanned one element at a time to produce
+`@term_array`, an array of terms to be added to the index.
+Then the method `index_map` is applied to produce two more
+data structures.  The first `@index_map`, is a hash
+mapping index terms to positions in the text. A position
+is just an order. If `((foo))` is the first term
+and `((bar))` is the second, their locations will be 0 and
+1. The second is `@index_array`, and array of pairs. If
+`((foo, bar))` appears twice at positions 7 and 11, the
+corresponding entry in `@index_array` is
+`[['foo', 'bar'], [7, 11]]`.  Once these structures
+are in place, the original text is scanned,
+using `@index_map` to replace
+index terms by Asciidoc inline macros.  Thus
+`((foo, bar))` at location 7 becomes
+`index_term::['foo, bar', 7, mark]`, and
+`(((Ho ho ho)))` at location 23 becomes
+`index_term::['Ho ho ho', 23, invisible]`.
+When `Asciidoctor` renders the transformed
+text, the first of these become
+----
+  <span class='index_term' id = 'index_term_7'>foo, bar</span>
+----
+while the second becomes
+----
+  <span class='invisible' id = 'index_term_23'>Ho ho ho</span>
+----
+Subsequently, the data structure `@index_array`
+is used to produce the index, which is appended
+to the transform version of the main text. An
+element of `@index_array` like
+  `[['foo', 'bar'], [7]]`
+produces the string
+----
+  <<index_term_7, 'foo, bar'>>
+----
+Cases like `[['foo', 'bar'], [7, 11]]`
+have not yet been treated.  
