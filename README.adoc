@@ -4,8 +4,7 @@
 an index for Asciidoc documents.  At the
 moment it requires the `Asciidoctor-LaTeX` extension.footnote:[The
 dependence is entirely on the use of the inline macro
-`index_term`, as in  `index_term::['Arthur', 0]`
-or `index_term::['Sword, Broadsword, Excalibur', 1]`.  Some css
+`index_term`  Some css
 is also required. ]
 
 
